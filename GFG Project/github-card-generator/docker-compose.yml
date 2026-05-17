@@ -1,0 +1,22 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./backend/.env
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "80:80"
+    environment:
+      # This is the URL the browser will use to reach the backend.
+      # For local testing, it should be localhost pointing to the backend's published port.
+      - BACKEND_URL=http://localhost:8080
+    depends_on:
+      - backend

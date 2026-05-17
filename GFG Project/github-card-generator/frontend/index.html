@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Dev Card</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #050505; color: #fff; margin: 0; overflow-x: hidden; }
+        .cyber-bg { background: radial-gradient(circle at 50% 50%, #111 0%, #000 100%); }
+        .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); }
+        .card-pop { animation: popScale 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes popScale { from { opacity: 0; transform: scale(0.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        
+        /* Responsive Card Container */
+        .card-wrapper {
+            width: 100%;
+            max-width: 480px;
+            aspect-ratio: 480 / 650;
+            position: relative;
+        }
+        @media (max-width: 520px) {
+            .card-wrapper {
+                transform: scale(0.8);
+                margin: -50px 0;
+            }
+        }
+        @media (max-width: 400px) {
+            .card-wrapper {
+                transform: scale(0.7);
+                margin: -80px 0;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen cyber-bg flex flex-col items-center p-4 md:p-10">
+    <div id="root" class="w-full max-w-4xl"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        window.downloadPNG = () => {
+            const iframe = document.querySelector("#card-frame");
+            if(!iframe) return;
+            const cardEl = iframe.contentWindow.document.querySelector("#github-dev-card");
+            const act = iframe.contentWindow.document.querySelector("#act-bar");
+            if(act) act.style.display = 'none';
+            html2canvas(cardEl, { backgroundColor: '#000', scale: 3, useCORS: true }).then(c => {
+                const l = document.createElement('a');
+                l.download = 'identity.png';
+                l.href = c.toDataURL();
+                l.click();
+                if(act) act.style.display = 'flex';
+            });
+        };
+
+        function App() {
+            const [user, setUser] = useState('');
+            const [model, setModel] = useState('gemini-3.1-flash-lite');
+            const [loading, setLoading] = useState(false);
+            const [card, setCard] = useState(null);
+            const [msg, setMsg] = useState('');
+            const [err, setErr] = useState('');
+
+            const go = async () => {
+                if (!user || loading) return;
+                setLoading(true); setErr(''); setMsg('');
+                try {
+                    const API_BASE = window.location.origin.includes('file') ? 'http://127.0.0.1:8080' : window.location.origin;
+                    const res = await fetch(`${API_BASE}/generate`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: user, model: model })
+                    });
+                    
+                    const text = await res.text();
+                    if (!res.ok) throw new Error(`Server Error (${res.status})`);
+
+                    let d;
+                    try { d = JSON.parse(text); } catch(e) { throw new Error("Terminal returned garbled data."); }
+                    
+                    if (d.status === 'error') throw new Error(d.message);
+                    setMsg(d.message || '');
+                    
+                    let cardData = d;
+                    if (d.content && Array.isArray(d.content)) {
+                        const identityPart = d.content.find(c => c.text && c.text.includes('html'));
+                        if (identityPart) {
+                            try { cardData = JSON.parse(identityPart.text); } catch(e) {}
+                        }
+                    }
+
+                    if (!cardData.html) throw new Error("Identity card generation failed.");
+                    setCard(cardData);
+                } catch (e) { 
+                    setErr(e.message); 
+                }
+                finally { setLoading(false); }
+            };
+
+            return (
+                <div class="w-full flex flex-col items-center gap-8 pb-20">
+                    {/* TOP UI SECTION */}
+                    <div class="w-full flex flex-col items-center gap-6">
+                        <div class="text-center space-y-1">
+                            <h1 class="text-4xl md:text-6xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-500 to-fuchsia-500 py-2">
+                                GitHub Dev Card
+                            </h1>
+                            <p class="text-zinc-500 font-bold uppercase tracking-[0.4em] text-[8px] md:text-[10px]">Secure Identity Protocol v3.2</p>
+                        </div>
+
+                        <div class="w-full max-w-lg space-y-4">
+                            <div class="glass p-2 rounded-2xl flex gap-2 shadow-2xl">
+                                <input value={user} onChange={e=>setUser(e.target.value)} placeholder="@username" class="flex-1 bg-transparent px-4 md:px-6 py-3 md:py-4 outline-none font-bold text-lg md:text-xl text-white w-0" onKeyPress={e=>e.key==='Enter'&&go()} />
+                                <button onClick={go} disabled={loading} class="bg-white text-black px-6 md:px-10 py-3 md:py-4 rounded-xl font-black uppercase text-[10px] md:text-xs hover:bg-zinc-200 active:scale-95 transition-all shadow-lg whitespace-nowrap">
+                                    {loading ? 'WAIT' : 'GENERATE'}
+                                </button>
+                            </div>
+                            
+                            <div class="flex justify-center gap-3">
+                                <select 
+                                    value={model} 
+                                    onChange={e=>setModel(e.target.value)}
+                                    class="bg-zinc-900/80 border border-zinc-700 text-white text-[10px] font-black uppercase tracking-widest px-5 py-2.5 rounded-full outline-none hover:border-zinc-500 transition-all cursor-pointer shadow-xl"
+                                >
+                                    <option value="auto">Auto-Detect</option>
+                                    <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash-Lite</option>
+                                    <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro</option>
+                                    <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                                    <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ERROR DISPLAY */}
+                    {err && (
+                        <div class="text-rose-400 font-bold text-sm bg-rose-500/10 p-6 rounded-2xl border border-rose-500/20 w-full text-center max-w-lg card-pop">
+                            {err}
+                        </div>
+                    )}
+
+                    {/* CARD DISPLAY SECTION */}
+                    <div class="w-full flex flex-col items-center gap-8 min-h-[500px]">
+                        {msg && (
+                            <div class="w-full max-w-lg glass p-4 md:p-6 rounded-3xl border-indigo-500/20 card-pop">
+                                <p class="text-zinc-400 font-medium leading-relaxed italic text-sm md:text-base text-center">
+                                    <span class="text-indigo-400 font-black uppercase text-[10px] block mb-2 tracking-widest">Agent Transmission</span>
+                                    "{msg}"
+                                </p>
+                            </div>
+                        )}
+
+                        {loading && !card ? (
+                            <div class="w-full max-w-[480px] aspect-[480/650] rounded-[3rem] bg-zinc-900/40 animate-pulse border border-zinc-800 flex items-center justify-center">
+                                <span class="text-zinc-600 font-black uppercase text-[10px] md:text-[12px] tracking-[0.5em]">Establishing Uplink...</span>
+                            </div>
+                        ) : card ? (
+                            <div key={card.url} class={`w-full flex flex-col items-center gap-8 ${loading ? 'opacity-30' : 'card-pop'}`}>
+                                <div class="flex items-center gap-3 bg-green-500/10 border border-green-500/20 px-8 py-3 rounded-full shadow-lg">
+                                    <div class="w-2 h-2 rounded-full bg-green-500 animate-ping"></div>
+                                    <span class="text-[10px] md:text-[12px] font-black tracking-[0.4em] uppercase text-green-400">{card.theme || 'IDENTITY'} SECURED</span>
+                                </div>
+
+                                <div class="card-wrapper bg-[#0d1117] border-[4px] md:border-[6px] border-zinc-900 rounded-[3rem] overflow-hidden shadow-2xl ring-1 ring-white/5">
+                                    <iframe 
+                                        id="card-frame"
+                                        srcDoc={card.html} 
+                                        class="w-full h-full border-none block" 
+                                        scrolling="no"
+                                    />
+                                </div>
+                                
+                                <button onClick={()=> {
+                                    const base = window.location.origin.includes('file') ? 'http://127.0.0.1:8080' : window.location.origin;
+                                    navigator.clipboard.writeText(`${base}${card.url}`); 
+                                    alert('Link Copied!');
+                                }} class="px-10 py-4 rounded-full border border-zinc-800 hover:border-zinc-500 text-zinc-600 hover:text-white transition-all text-[10px] font-black uppercase tracking-[0.3em] bg-white/5">Copy Link</button>
+                            </div>
+                        ) : (
+                            <div class="w-full max-w-[480px] aspect-[480/650] rounded-[3rem] border border-dashed border-zinc-800 flex flex-col items-center justify-center text-zinc-700 gap-4 opacity-50">
+                                <div class="w-16 h-16 border-2 border-zinc-800 rounded-full flex items-center justify-center text-2xl font-black">?</div>
+                                <span class="font-black uppercase text-[10px] tracking-[0.2em]">Awaiting Subject Data</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body></html>

@@ -1,0 +1,51 @@
+
+    <!DOCTYPE html><html><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <link href='https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@700&display=swap' rel='stylesheet'>
+    <script src='https://cdn.tailwindcss.com'></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: transparent; }
+        .tag-font { font-family: 'JetBrains Mono', monospace; }
+    </style></head>
+    <body>
+        <div id='github-dev-card' class='p-10 rounded-[3rem] border-[6px]' style='background: linear-gradient(180deg, #111827 0%, #0b1221 100%); border-color: #3b82f6; color: #f1f5f9; width: 500px; position: relative; overflow: hidden; box-shadow: 0 0 40px rgba(59, 130, 246, 0.3);'>
+            <!-- Role Tag Badge -->
+            <div class='absolute top-0 right-0 px-6 py-2 rounded-bl-3xl font-black tag-font text-[10px] tracking-[0.2em]' style='background: #3b82f6; color: #fff;'>
+                MASTER-BUILDER
+            </div>
+
+            <div class='flex items-center gap-6 mb-8 mt-2'>
+                <img src='https://avatars.githubusercontent.com/u/1024025?v=4' class='w-24 h-24 rounded-full border-4 shadow-2xl' style='border-color: #3b82f6;' />
+                <div class='min-w-0'>
+                    <h2 class='text-3xl font-black uppercase tracking-tighter leading-none mb-1 truncate'>Linus Torvalds</h2>
+                    <p class='text-sm font-bold opacity-60'>@torvalds</p>
+                </div>
+            </div>
+
+            <p class='text-xl italic font-medium mb-8 leading-tight opacity-90'>"A mysterious developer in the digital void."</p>
+
+            <div class='grid grid-cols-2 gap-4 mb-8'>
+                <div class='p-5 rounded-2xl border' style='background: rgba(128,128,128,0.05); border-color: rgba(128,128,128,0.1);'>
+                    <span class='block text-[10px] font-black uppercase tracking-widest mb-3 opacity-50 tag-font'>Attributes</span>
+                    <div class="flex justify-between text-xs font-bold mb-1"><span class="opacity-70">Focus</span><span class="tag-font">80</span></div><div class="flex justify-between text-xs font-bold mb-1"><span class="opacity-70">Velocity</span><span class="tag-font">70</span></div><div class="flex justify-between text-xs font-bold mb-1"><span class="opacity-70">Impact</span><span class="tag-font">90</span></div>
+                </div>
+                <div class='p-5 rounded-2xl border flex flex-col justify-center' style='background: rgba(128,128,128,0.05); border-color: rgba(128,128,128,0.1);'>
+                    <span class='block text-[10px] font-black uppercase tracking-widest mb-2 opacity-30 tag-font italic text-center'>AI Roast</span>
+                    <p class='text-sm font-bold italic leading-snug text-center'>"Your code is so secret even you don't know how it works."</p>
+                </div>
+            </div>
+
+            <div class='flex flex-wrap justify-center gap-2 mb-8'>
+                <span class="px-3 py-1 text-[9px] font-black uppercase border-2 rounded-full tag-font" style="border-color: #3b82f6">OpenSCAD</span><span class="px-3 py-1 text-[9px] font-black uppercase border-2 rounded-full tag-font" style="border-color: #3b82f6">C</span><span class="px-3 py-1 text-[9px] font-black uppercase border-2 rounded-full tag-font" style="border-color: #3b82f6">C++</span>
+            </div>
+
+            <div class='flex justify-between text-[10px] font-black uppercase tracking-[0.3em] opacity-40 tag-font'>
+                <span>126 DAY STREAK</span>
+                <span>★ 11 REPOS</span>
+            </div>
+
+            <div id='act-bar' class='mt-8 pt-6 border-t-2 flex' style='border-color: rgba(128,128,128,0.1);'>
+                <button onclick='window.parent.downloadPNG()' class='flex-1 p-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:opacity-80 transition shadow-lg' style='background: #3b82f6; color: #fff;'>Download Identity File</button>
+            </div>
+        </div>
+    </body></html>
+    
