@@ -5,6 +5,7 @@ A web application that generates beautiful, shareable cards for GitHub profiles.
 ## Live Demo
 
 - **Frontend**: [https://github-card-frontend-15131588805.us-central1.run.app](https://github-card-frontend-15131588805.us-central1.run.app)
+- (note : if the frontend link does not run just try the backed link )
 - **Backend API**: [https://github-card-backend-15131588805.us-central1.run.app](https://github-card-backend-15131588805.us-central1.run.app)
 
 *(Note: These services are currently deployed on Google Cloud Run)*
